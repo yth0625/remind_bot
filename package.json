@@ -11,5 +11,10 @@
     "url": "https://dev.architectgroup.com/taehyeon.yun/remind-bot.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^4.18.1",
+    "express": "^4.16.2",
+    "nodemon": "^1.15.1"
+  }
 }
