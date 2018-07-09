@@ -13,7 +13,7 @@ const remindCheck = require('./app/remind');
 setInterval(
     () => {
         remindCheck();
-    }, 20000
+    }, 60000
 );
 
 app.listen(port, () => console.log('app listening on port ' + port));
