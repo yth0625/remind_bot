@@ -20,7 +20,7 @@ function viewList ( channelId, printText, res ) {
     })
         .map( ( List ) => {
             List.remindList.map((remind, index) => {
-                text += `| ${index + 1} | ${remind.post} | ${new Date(remind.remindTime).toLocaleString()} | ${new Date(remind.creationTime).toLocaleString()} | ${remind.createdBy} | ${remind.remindType ? 'run once' : 'forevery'} |\n`;
+                text += `| ${index + 1} | ${remind.post} | ${new Date(remind.remindTime).toLocaleString()} | ${new Date(remind.creationTime).toLocaleString()} | ${remind.createdBy} | ${remind.remindType} |\n`;
             });
         });
 
@@ -47,7 +47,7 @@ module.exports = (app) => {
     app.post('/remind', (req, res) => {
         const { text } = req.body;
         const { channel_id } = req.body;
-        let remindType = true; //true run once, false run forever
+        let remindType = 'once'; //true run once, false run forever
 
         if ( text === 'list') {
             viewList( channel_id, '현재 리스트를 출력합니다.\n\n', res);
@@ -63,8 +63,13 @@ module.exports = (app) => {
         }
 
         if ( outputText[0] === '-f') {
-            outputText.splice(0, 1);
-            remindType = false;
+            if(outputText[1] === 'week' || outputText[1] === 'day') {
+                remindType = outputText[1];
+                outputText.splice(0, 2);
+            } else {
+                res.send({ response_type: 'ephemeral', text: '입력한 옵션 형식이 틀렸습니다. week 또는 day 를 설정해주세요 ex) -f {week or day}' });
+                return new Error('옵션 형식이 틀렸습니다.');
+            }
         }   
 
         const remindDate = new Date(outputText[0]); // Year, Month, Day 입력
