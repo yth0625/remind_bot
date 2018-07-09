@@ -12,7 +12,7 @@ function saveStorage() {
 }
 
 function viewList ( channelId, printText, res ) {
-    let text = printText + '| 순서 | 포스트 | 리마인드 타임 | 만든 시간 | 만든 사람 |\n|-----|-----|-----|-----|-----|\n';
+    let text = printText + '| 순서 | 포스트 | 리마인드 타임 | 만든 시간 | 만든 사람 | 리마인드 타입 |\n|-----|-----|-----|-----|-----|\n';
     remindFile.channelList.filter( (List) => {
         if ( List.channelId === channelId ) {
             return List;
@@ -20,7 +20,7 @@ function viewList ( channelId, printText, res ) {
     })
         .map( ( List ) => {
             List.remindList.map((remind, index) => {
-                text += `| ${index + 1} | ${remind.post} | ${new Date(remind.remindTime).toLocaleString()} | ${new Date(remind.creationTime).toLocaleString()} | ${remind.createdBy} |\n`;
+                text += `| ${index + 1} | ${remind.post} | ${new Date(remind.remindTime).toLocaleString()} | ${new Date(remind.creationTime).toLocaleString()} | ${remind.createdBy} | ${remind.remindType ? 'run once' : 'forevery'} |\n`;
             });
         });
 
@@ -47,6 +47,7 @@ module.exports = (app) => {
     app.post('/remind', (req, res) => {
         const { text } = req.body;
         const { channel_id } = req.body;
+        let remindType = true; //true run once, false run forever
 
         if ( text === 'list') {
             viewList( channel_id, '현재 리스트를 출력합니다.\n\n', res);
@@ -60,7 +61,12 @@ module.exports = (app) => {
             remindDelete(channel_id, outputText[1], res);
             return;
         }
-     
+
+        if ( outputText[0] === '-f') {
+            outputText.splice(0, 1);
+            remindType = false;
+        }   
+
         const remindDate = new Date(outputText[0]); // Year, Month, Day 입력
         outputText.splice(0, 1);
         
@@ -101,7 +107,8 @@ module.exports = (app) => {
                     'post': remindText,
                     'creationTime': new Date().getTime(),
                     'remindTime': remindDate.getTime(),
-                    'createdBy': req.body.user_name
+                    'createdBy': req.body.user_name,
+                    'remindType': remindType
                 });
                 viewList( channel_id, '리마인드가 등록되었습니다.\n\n', res);
                 saveStorage();
@@ -114,7 +121,8 @@ module.exports = (app) => {
                             'post': remindText,
                             'creationTime': Date.now(),
                             'remindTime': remindDate.getTime(),
-                            'createdBy': req.body.user_name
+                            'createdBy': req.body.user_name,
+                            'remindType': remindType
                         }
                     ]
                 };
@@ -129,7 +137,8 @@ module.exports = (app) => {
                             'post': remindText,
                             'creationTime': Date.now(),
                             'remindTime': remindDate.getTime(),
-                            'createdBy': req.body.user_name
+                            'createdBy': req.body.user_name,
+                            'remindType': remindType
                         }
                     ]
                 });

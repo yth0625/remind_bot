@@ -25,7 +25,9 @@ module.exports = () => {
                 fetch('https://chat.architectgroup.com/api/v4/posts', options)
                     .then( () => console.log('포스트가 성공적으로 등록되었습니다.') )
                     .catch(err => console.error(err));
-                return;
+                
+                if ( remind.remindType ) return;
+                else return remind;
             }
             return remind;
         });
