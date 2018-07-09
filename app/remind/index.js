@@ -27,7 +27,7 @@ module.exports = () => {
                     .catch(err => console.error(err));
                 
                 if ( remind.remindType === 'week') {remind.remindTime += 86400000 * 7; return remind}
-                else if ( remind.remindType === 'day') {remind.reminidTime += 86400000; return remind}
+                else if ( remind.remindType === 'day') {remind.remindTime += 86400000; return remind}
                 else return;
             }
             return remind;
