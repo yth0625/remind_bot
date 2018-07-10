@@ -17,8 +17,7 @@ function viewList ( channelId, printText, res ) {
         if ( List.channelId === channelId ) {
             return List;
         }
-    })
-        .map( ( List ) => {
+    }).map( ( List ) => {
             List.remindList.map((remind, index) => {
                 text += `| ${index + 1} | ${remind.post} | ${new Date(remind.remindTime).toLocaleString()} | ${new Date(remind.creationTime).toLocaleString()} | ${remind.createdBy} | ${remind.remindType} |\n`;
             });
@@ -48,39 +47,43 @@ module.exports = (app) => {
         const { text } = req.body;
         const { channel_id } = req.body;
         let remindType = 'once'; //true run once, false run forever
-
-        if ( text === 'list') {
-            viewList( channel_id, '현재 리스트를 출력합니다.\n\n', res);
-            return;
-        }  
-
         const outputText = text.split(' ');
 
-        if ( outputText[0] === 'delete' ) {
-            console.log(outputText);
-            remindDelete(channel_id, outputText[1], res);
+        switch( outputText[0] ) {
+            case '-d':
+                remindDelete(channel_id, outputText[1], res);
+            return;
+            case '-f':
+                if( outputText[1] === 'week' || outputText[1] === 'day' ) {
+                    remindType = outputText[1];
+                    outputText.splice(0, 2);
+                } else {
+                    res.send({ response_type: 'ephemeral', text: '입력한 옵션 형식이 틀렸습니다. week 또는 day 를 설정해주세요 ex) -f {week or day}' });
+                    return new Error('옵션 형식이 틀렸습니다.');
+                }
+            break;
+            case '-l':
+                viewList( channel_id, '현재 리스트를 출력합니다.\n\n', res);
+            return;
+            case '-h':
+                res.send({ response_type: 'ephemeral', text: '사용 가능 옵션:\n-h: 사용 방법 보기\n-f: 매일, 매주 반복하는 옵션 day, week ex) -f {week or day}\n-l: 현재 채널의 리스트 확인\n-d: 리마인드 삭제 ex) -d {삭제 할 리마인드 인덱스(-l 로 확인 가능)}\n\n기본 사용 방법:\n날짜와 시간 함께 설정 ex) 2018/01/01 12:35 {remind Text}\n시간만 설정(날짜는 오늘로) ex) 21:45 {remind Text}' });
             return;
         }
 
-        if ( outputText[0] === '-f') {
-            if(outputText[1] === 'week' || outputText[1] === 'day') {
-                remindType = outputText[1];
-                outputText.splice(0, 2);
-            } else {
-                res.send({ response_type: 'ephemeral', text: '입력한 옵션 형식이 틀렸습니다. week 또는 day 를 설정해주세요 ex) -f {week or day}' });
-                return new Error('옵션 형식이 틀렸습니다.');
-            }
-        }   
-
-        const remindDate = new Date(outputText[0]); // Year, Month, Day 입력
-        outputText.splice(0, 1);
+        let remindDate;
+        if ( outputText.length >= 3) {
+            remindDate = new Date(outputText[0]); // Year, Month, Day 입력
+            outputText.splice(0, 1);
+        } else {
+            remindDate = new Date();
+        }
         
         let outputTime =  [];
         try {
             outputTime = outputText[0].split(':');
             outputText.splice(0, 1);
         } catch (error) {
-            res.send({ response_type: 'ephemeral', text: '입력한 형식이 틀렸습니다. ex) 2018/01/01 12:35 {remind Text}' });
+            res.send({ response_type: 'ephemeral', text: '입력한 형식이 틀렸습니다. -h 옵션을 사용하세요.' });
             return new Error('날짜 형식이 틀렸습니다.');
         }
 
@@ -89,7 +92,7 @@ module.exports = (app) => {
         remindDate.setMinutes(outputTime[1]);
 
         if ( isNaN(remindDate) ) {
-            res.send({ response_type: 'ephemeral', text: '입력한 형식이 틀렸습니다. ex) 2018/01/01 12:35 {remind Text}' });
+            res.send({ response_type: 'ephemeral', text: '입력한 형식이 틀렸습니다. -h 옵션을 사용하세요.' });
             return new Error('날짜 형식이 틀렸습니다.');
         }
 
