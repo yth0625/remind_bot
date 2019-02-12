@@ -1,19 +1,19 @@
 const fetch = require('node-fetch');
-let userToken = 'test';
+let userToken = '';
 
 const options = {
     method: 'POST',
     body: JSON.stringify(
         {
-            'login_id': 'remind_bot',
-            'password': 'snix123%'
+            'login_id': `${userId}`,
+            'password': `${userPassword}`
         }
     ),
     headers: { 'Content-Type': 'application/json' }
 };
 
 function updateToken() {
-    return fetch('https://chat.architectgroup.com/api/v4/users/login', options)
+    return fetch(`${process.env['MatterMost_SERVER_URL']}/api/v4/users/login`, options)
         .then(res => {
             userToken = res.headers.raw().token[0];
         });

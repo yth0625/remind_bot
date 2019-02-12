@@ -2,7 +2,11 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const storagePath = './storage/remindList.json';
 let remindFile = require('../../' + storagePath);
-const token = '9w3znsegainjdp9y4oa4cqhgiy';
+
+//use personal accesstoken
+const token = 'personal access token of remind bot account';
+
+//if you do not use personal access token. use user/index.js
 
 module.exports = () => {
     const currentTime = Date.now();
@@ -22,7 +26,7 @@ module.exports = () => {
                     }
                 };
 
-                fetch('https://chat.architectgroup.com/api/v4/posts', options)
+                fetch(`${process.env['MatterMost_SERVER_URL']}/api/v4/posts`, options)
                     .then( () => console.log('포스트가 성공적으로 등록되었습니다.') )
                     .catch(err => console.error(err));
                 
