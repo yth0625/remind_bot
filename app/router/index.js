@@ -1,5 +1,5 @@
 const fs = require('fs');
-const storagePath = './storage/remindList.json';
+const storagePath = './config/remindList.json';
 const remindFile = require('../../' + storagePath);
 
 function saveStorage() {

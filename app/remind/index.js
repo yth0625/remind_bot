@@ -1,6 +1,6 @@
 const fs = require('fs');
 const fetch = require('node-fetch');
-const storagePath = './storage/remindList.json';
+const storagePath = './config/remindList.json';
 let remindFile = require('../../' + storagePath);
 
 //use personal accesstoken
@@ -30,8 +30,8 @@ module.exports = () => {
                     .then( () => console.log('포스트가 성공적으로 등록되었습니다.') )
                     .catch(err => console.error(err));
                 
-                if ( remind.remindType === 'week') {remind.remindTime += 86400000 * 7; return remind}
-                else if ( remind.remindType === 'day') {remind.remindTime += 86400000; return remind}
+                if ( remind.remindType === 'week') {remind.remindTime += 86400000 * 7; return remind;}
+                else if ( remind.remindType === 'day') {remind.remindTime += 86400000; return remind;}
                 else return;
             }
             return remind;
