@@ -44,10 +44,9 @@ function remindDelete(channelId, index, res) {
 
 module.exports = (app) => {
     app.post('/remind', (req, res) => {
-        const { text } = req.body;
         const { channel_id } = req.body;
         let remindType = 'once'; //true run once, false run forever
-        const outputText = text.split(' ');
+        const outputText = req.body.text.split(' ');
 
         switch( outputText[0] ) {
             case '-d':
@@ -71,14 +70,16 @@ module.exports = (app) => {
         }
 
         let remindDate;
-        if ( outputText.length >= 3) {
+        let outputTime = [];
+        let remindText = '';
+
+        if ( isNaN(new Date(outputText[0]))) {
+            remindDate = new Date();
+        } else {
             remindDate = new Date(outputText[0]); // Year, Month, Day 입력
             outputText.splice(0, 1);
-        } else {
-            remindDate = new Date();
         }
         
-        let outputTime =  [];
         try {
             outputTime = outputText[0].split(':');
             outputText.splice(0, 1);
@@ -101,7 +102,6 @@ module.exports = (app) => {
             return new Error('날짜 형식이 틀렸습니다.');
         }
 
-        let remindText = '';
         outputText.map(
             (text) => { 
                 remindText += text + ' ';
